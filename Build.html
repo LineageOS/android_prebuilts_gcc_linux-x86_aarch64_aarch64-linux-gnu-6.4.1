@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<meta name="robots" content="index,nofollow">
+
+<title>ABE - Linaro Wiki</title>
+<script type="text/javascript" src="/moin_static198/common/js/common.js"></script>
+
+<script type="text/javascript">
+<!--
+var search_hint = "搜索";
+//-->
+</script>
+
+
+<link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="/moin_static198/linaro-white/css/common.css">
+<link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="/moin_static198/linaro-white/css/screen.css">
+<link rel="stylesheet" type="text/css" charset="utf-8" media="print" href="/moin_static198/linaro-white/css/print.css">
+<link rel="stylesheet" type="text/css" charset="utf-8" media="projection" href="/moin_static198/linaro-white/css/projection.css">
+
+<!-- css only for MS IE6/IE7 browsers -->
+<!--[if lt IE 8]>
+   <link rel="stylesheet" type="text/css" charset="utf-8" media="all" href="/moin_static198/linaro-white/css/msie.css">
+<![endif]-->
+
+
+<link rel="alternate" title="Linaro Wiki: ABE" href="/ABE?diffs=1&amp;show_att=1&amp;action=rss_rc&amp;unique=0&amp;page=ABE&amp;ddiffs=1" type="application/rss+xml">
+
+
+<link rel="Start" href="/FrontPage">
+<link rel="Search" href="/FindPage">
+<link rel="Index" href="/TitleIndex">
+<link rel="Glossary" href="/WordIndex">
+<link rel="Help" href="/HelpOnFormatting">
+</head>
+
+<body  lang="zh" dir="ltr">
+<div id="wrapper">
+<div id="wrapper_inner">
+<div id="content">
+<p class="line867"><span class="anchor" id="line-3"></span><p class="line867"><div class="table-of-contents"><p class="table-of-contents-heading">Table of Contents<ol><li>
+<a href="#What_is_a_toolchain_.28cross.2C_native.29.3F">What is a toolchain (cross, native)?</a></li><li>
+<a href="#What_is_ABE.3F_Why_it_exists.3F">What is ABE? Why it exists?</a></li><li>
+<a href="#ABE_Basic_Concepts">ABE Basic Concepts</a></li><li>
+<a href="#ABE_Methodology">ABE Methodology</a></li><li>
+<a href="#What_can_ABE_do">What can ABE do</a></li><li>
+<a href="#Getting_ABE">Getting ABE</a></li><li>
+<a href="#Building_Toolchains_With_ABE">Building Toolchains With ABE</a></li><li>
+<a href="#Configuring_ABE">Configuring ABE</a></li><li>
+<a href="#Dependencies">Dependencies</a></li><li>
+<a href="#Building_the_Toolchain_with_ABE">Building the Toolchain with ABE</a></li><li>
+<a href="#Common_Examples">Common Examples</a></li><li>
+<a href="#ABE_Directory_Structure">ABE Directory Structure</a></li><li>
+<a href="#User_Config_File_.28.2BAH4-.2F.aberc.29">User Config File (~/.aberc)</a></li><li>
+<a href="#Default_Behaviors">Default Behaviors</a></li><li>
+<a href="#Specifying_Sources">Specifying Sources</a></li><li>
+<a href="#Specifying_Component_Versions">Specifying Component Versions</a></li><li>
+<a href="#Specifying_Local_or_Remote_Tarballs_or_Repositories">Specifying Local or Remote Tarballs or Repositories</a></li><li>
+<a href="#Building_Linaro_Releases_from_Manifest">Building Linaro Releases from Manifest</a></li><li>
+<a href="#Building_Your_Own_Releases">Building Your Own Releases</a></li><li>
+<a href="#Testing_and_Verifying_A_Toolchain_Built_With_ABE">Testing and Verifying A Toolchain Built With ABE</a></li><li>
+<a href="#Getting.2FDownloading_Component_Source_code">Getting/Downloading Component Source code</a></li><li>
+<a href="#Full_Options_List">Full Options List</a></li><li>
+<a href="#Manual_Hacking">Manual Hacking</a></li><li>
+<a href="#Jenkins_Integration">Jenkins Integration</a></li><li>
+<a href="#FAQ">FAQ</a></li></ol></li></ol></div> <span class="anchor" id="line-4"></span><span class="anchor" id="line-5"></span><p class="line867">
+<h2 id="What_is_a_toolchain_.28cross.2C_native.29.3F">What is a toolchain (cross, native)?</h2>
+<span class="anchor" id="line-6"></span><p class="line874">The primary purpose of a toolchain is to compile and link source code into executables and shared libraries. It can be a native or a cross toolchain. Native means your host and target are the same. Cross means they’re different. <span class="anchor" id="line-7"></span><span class="anchor" id="line-8"></span><p class="line862">To build a toolchain, traditionally the steps are:<br>
+ <span class="anchor" id="line-9"></span>* Download sources<br>
+ <span class="anchor" id="line-10"></span>* Build dependencies<br>
+ <span class="anchor" id="line-11"></span>* Build binutils<br>
+ <span class="anchor" id="line-12"></span>* Install kernel header files<br>
+ <span class="anchor" id="line-13"></span>* Build 1st stage GCC - a minimal GCC C compiler suitable for building the C library<br>
+ <span class="anchor" id="line-14"></span>* Build C library<br>
+ <span class="anchor" id="line-15"></span>* Build 2nd stage GCC - a full GCC<br>
+ <span class="anchor" id="line-16"></span><span class="anchor" id="line-17"></span><p class="line874">Using ABE, the steps now become: <span class="anchor" id="line-18"></span><span class="anchor" id="line-19"></span><ul><li style="list-style-type:none"><p class="line891"><strong>./configure</strong><br>
+ <span class="anchor" id="line-20"></span><strong>./abe.sh --target &lt;triplet&gt; --build all</strong> <span class="anchor" id="line-21"></span><span class="anchor" id="line-22"></span></li></ul><p class="line874">If you don't specify --target, a native build is done instead of a cross build. <span class="anchor" id="line-23"></span><span class="anchor" id="line-24"></span><p class="line867">
+<h2 id="What_is_ABE.3F_Why_it_exists.3F">What is ABE? Why it exists?</h2>
+<span class="anchor" id="line-25"></span><span class="anchor" id="line-26"></span><p class="line874">ABE stands for Advanced Build Environment. It is the official Linaro Toolchain Build Framework. It exists because Linaro needed a better tool for automating the build and test process for the toolchain. <span class="anchor" id="line-27"></span><span class="anchor" id="line-28"></span><p class="line874">Historically, every Linaro engineer (or anyone who wants to build a toolchain for that matter) has his/her own scripts that build toolchains in various different ways. Among the issues with this approach are: <span class="anchor" id="line-29"></span><span class="anchor" id="line-30"></span><p class="line862">* unsupported hacks required<br>
+ <span class="anchor" id="line-31"></span>* unsupported patches required<br>
+ <span class="anchor" id="line-32"></span>* incompatible with git<br>
+ <span class="anchor" id="line-33"></span>* not fully integrated with the Linaro build and test processes<br>
+ <span class="anchor" id="line-34"></span><span class="anchor" id="line-35"></span><p class="line874">These issues introduce discrepancies between what we use and what we distribute to member companies. In order to have some uniformity and be sure what we release is what we tested, i.e. built the same way, ABE was developed. <span class="anchor" id="line-36"></span><span class="anchor" id="line-37"></span><p class="line867">
+<h2 id="ABE_Basic_Concepts">ABE Basic Concepts</h2>
+<span class="anchor" id="line-38"></span><span class="anchor" id="line-39"></span><p class="line862">* Rather than Makefiles, it should uses Bourne shell scripts for more functionality and maintainability. Both Android and Chromium use this technique.<br>
+ <span class="anchor" id="line-40"></span>* Uses shell scripts as config files, ala <strong>*.conf</strong> and set global variables or custom functions.<br>
+ <span class="anchor" id="line-41"></span>* Each config file lists its major build time dependencies and configure options. The default config files are copied into the build tree, where they can be edited, overriding the default options. This makes it easier to integrate manual building and testing with automation in a way that's consistent.<br>
+ <span class="anchor" id="line-42"></span>* Replaces crosstool-ng with similar functionality, but better integrated into Linaro build and test processes.<br>
+ <span class="anchor" id="line-43"></span>* Should build all toolchains with no custom patches.<br>
+ <span class="anchor" id="line-44"></span><span class="anchor" id="line-45"></span><p class="line867">
+<h2 id="ABE_Methodology">ABE Methodology</h2>
+<span class="anchor" id="line-46"></span><span class="anchor" id="line-47"></span><p class="line862">ABE is a toolchain build utility tool. It produces:<br>
+ <span class="anchor" id="line-48"></span>* gcc-linaro-*.tar.xz – the compiler and tools<br>
+ <span class="anchor" id="line-49"></span>* runtime-linaro-*.tar.xz – runtime libraries needed on the target<br>
+ <span class="anchor" id="line-50"></span>* sysroot-linaro-*.tar.xz – sysroot (a set of libraries and headers to develop against) <span class="anchor" id="line-51"></span><span class="anchor" id="line-52"></span><p class="line867">
+<h2 id="What_can_ABE_do">What can ABE do</h2>
+<span class="anchor" id="line-53"></span><span class="anchor" id="line-54"></span><p class="line862">ABE is a feature-rich centralized platform. It isn't just used for x86-&gt;arm (cross) and arm-&gt;arm (native). It could be used for any target or host. <span class="anchor" id="line-55"></span><span class="anchor" id="line-56"></span><p class="line874">Among the common build options are: <span class="anchor" id="line-57"></span><span class="anchor" id="line-58"></span><p class="line862">* native toolchain: x86, x86_64, arm, aarch64<br>
+ <span class="anchor" id="line-59"></span>* cross toolchain: Likely candidates: x86*-&gt;arm, x86*-&gt;aarch64<br>
+ <span class="anchor" id="line-60"></span>* Canadian-cross toolchain: x86*-&gt;arm or x86*-&gt;aarch64, but runs on Win32<br>
+ <span class="anchor" id="line-61"></span><span class="anchor" id="line-62"></span><p class="line874">Simply by supplying the right options to a single command line script, users can: <span class="anchor" id="line-63"></span><span class="anchor" id="line-64"></span><p class="line862">* specify native or cross compilation<br>
+ <span class="anchor" id="line-65"></span>* specify which compiler and binutils to use for compiling programs<br>
+ <span class="anchor" id="line-66"></span>* specify custom configure options or use default set<br>
+ <span class="anchor" id="line-67"></span>* use binary snapshots for builds<br>
+ <span class="anchor" id="line-68"></span>* bootstrap development environment (when not using binary snapshots, i.e. pre-installed sysroot)<br>
+ <span class="anchor" id="line-69"></span>* run 3rd party benchmarks<br>
+ <span class="anchor" id="line-70"></span>* supply data for graphing performance and regressions<br>
+ <span class="anchor" id="line-71"></span>* build with stock Ubuntu toolchains<br>
+ <span class="anchor" id="line-72"></span>* build with trunk/master<br>
+ <span class="anchor" id="line-73"></span>* build all or part of the toolchain components<br>
+ <span class="anchor" id="line-74"></span>* specify download sources (Linaro, FSF, etc.) and versions<br>
+ <span class="anchor" id="line-75"></span>* automate configure and make commands<br>
+ <span class="anchor" id="line-76"></span>* automatically tag releases (e.g. src tarball ver X built with ABE ver Y)<br>
+ <span class="anchor" id="line-77"></span><span class="anchor" id="line-78"></span><p class="line867">
+<h2 id="Getting_ABE">Getting ABE</h2>
+<span class="anchor" id="line-79"></span><span class="anchor" id="line-80"></span><p class="line874">ABE is available from the Linaro GIT server: <span class="anchor" id="line-81"></span><span class="anchor" id="line-82"></span><p class="line867"><a class="https" href="https://git.linaro.org/toolchain/abe.git">https://git.linaro.org/toolchain/abe.git</a> <span class="anchor" id="line-83"></span><br>
+ <span class="anchor" id="line-84"></span><br>
+ <span class="anchor" id="line-85"></span>Clone from one of the URL above and checkout the stable branch. E.g. <span class="anchor" id="line-86"></span><span class="anchor" id="line-87"></span><ul><li style="list-style-type:none"><p class="line891"><strong>git clone <a class="https" href="https://git.linaro.org/toolchain/abe.git">https://git.linaro.org/toolchain/abe.git</a></strong> <span class="anchor" id="line-88"></span><span class="anchor" id="line-89"></span><p class="line891"><strong>git checkout stable</strong> <span class="anchor" id="line-90"></span><span class="anchor" id="line-91"></span></li></ul><p class="line867">
+<h2 id="Building_Toolchains_With_ABE">Building Toolchains With ABE</h2>
+<span class="anchor" id="line-92"></span><span class="anchor" id="line-93"></span><p class="line874">While it is possible to run ABE from its source tree, this isn't recommended. The best practice is to create a new project or build directory separate from the source directory, and configure ABE in that directory. That makes it easy to change branches, or even delete subdirectories. There are defaults for all paths, which is to create them under the same directory configure is run in. <span class="anchor" id="line-94"></span><span class="anchor" id="line-95"></span><p class="line874">To get started, create the build directory and then change to it. Any name for the directory will work. <span class="anchor" id="line-96"></span><span class="anchor" id="line-97"></span><p class="line867"><strong>mkdir _build; cd _build</strong> <span class="anchor" id="line-98"></span><span class="anchor" id="line-99"></span><p class="line874">Over the course of using ABE, multiple toolchains will obviously be built. A separate build directory is REQUIRED for each of these toolchains to ensure a clean build and use of the proper dependency chain. <span class="anchor" id="line-100"></span><span class="anchor" id="line-101"></span><p class="line867">
+<h2 id="Configuring_ABE">Configuring ABE</h2>
+<span class="anchor" id="line-102"></span><span class="anchor" id="line-103"></span><p class="line874">From the build directory: <span class="anchor" id="line-104"></span><span class="anchor" id="line-105"></span><p class="line867"><strong>../abe/configure</strong> <span class="anchor" id="line-106"></span><span class="anchor" id="line-107"></span><p class="line867">
+<h2 id="Dependencies">Dependencies</h2>
+<span class="anchor" id="line-108"></span><span class="anchor" id="line-109"></span><p class="line874">During the configure step, ABE will let you know if there are any missing dependencies. Mostly, they are: <span class="anchor" id="line-110"></span><span class="anchor" id="line-111"></span><p class="line874">bison automake autoconf libtool libncurses-dev gawk gcc-multilib g++-multilib zlib1g-dev <span class="anchor" id="line-112"></span><span class="anchor" id="line-113"></span><p class="line867"><strong>Repeat</strong> the configure step until there are no longer warnings for missing dependencies. <span class="anchor" id="line-114"></span><span class="anchor" id="line-115"></span><p class="line862">Most of the dependencies are actually for the toolchain, ABE just makes sure they're installed. The only non-default dependency for ABE is <strong>git-new-workdir</strong>. <span class="anchor" id="line-116"></span><span class="anchor" id="line-117"></span><p class="line874">Note that ‘sudo apt-get install git-new-workdir’ does NOT work. To install git-new-workdir, copy the script from your git installation’s contrib/workdir/ to one of your $PATH directories and chmod it to be executable. <span class="anchor" id="line-118"></span><span class="anchor" id="line-119"></span><p class="line867">
+<h2 id="Building_the_Toolchain_with_ABE">Building the Toolchain with ABE</h2>
+<span class="anchor" id="line-120"></span><span class="anchor" id="line-121"></span><p class="line874">From the build directory: <span class="anchor" id="line-122"></span><span class="anchor" id="line-123"></span><p class="line867"><strong>../abe/abe.sh --target &lt;triplet&gt; --build all</strong> <span class="anchor" id="line-124"></span><span class="anchor" id="line-125"></span><p class="line874">If you don't specify --target, a native build is done instead of a cross build. <span class="anchor" id="line-126"></span><span class="anchor" id="line-127"></span><p class="line867">
+<h2 id="Common_Examples">Common Examples</h2>
+<span class="anchor" id="line-128"></span><span class="anchor" id="line-129"></span><p class="line867"><strong>Cross Builds</strong> <span class="anchor" id="line-130"></span><span class="anchor" id="line-131"></span><ul><li style="list-style-type:none">Build a Linux cross toolchain: <span class="anchor" id="line-132"></span><span class="anchor" id="line-133"></span><ul><li style="list-style-type:none"><p class="line891"><strong>abe.sh --target arm-linux-gnueabihf --build all</strong> <span class="anchor" id="line-134"></span><span class="anchor" id="line-135"></span></li></ul>Build a Linux cross toolchain with eglibc as the clibrary: <span class="anchor" id="line-136"></span><span class="anchor" id="line-137"></span><ul><li style="list-style-type:none"><p class="line891"><strong>abe.sh --target arm-linux-gnueabihf --set libc=eglibc --build all</strong> <span class="anchor" id="line-138"></span><span class="anchor" id="line-139"></span></li></ul>Build a bare metal toolchain: <span class="anchor" id="line-140"></span><span class="anchor" id="line-141"></span><ul><li style="list-style-type:none"><p class="line891"><strong>abe.sh --target aarch64-elf --build all</strong> <span class="anchor" id="line-142"></span><span class="anchor" id="line-143"></span></li></ul></li></ul><p class="line867"><strong>Canadian Cross Builds</strong> <span class="anchor" id="line-144"></span><span class="anchor" id="line-145"></span><ul><li style="list-style-type:none">Build a Windows cross toolchain on a Linux system: <span class="anchor" id="line-146"></span><span class="anchor" id="line-147"></span><ul><li style="list-style-type:none"><p class="line891"><strong>abe.sh --target arm-linux-gnueabihf --build all</strong><br>
+ <span class="anchor" id="line-148"></span><strong>abe.sh --host x86_64-linux-gnu --target arm-linux-gnueabihf --build all</strong> <span class="anchor" id="line-149"></span><span class="anchor" id="line-150"></span></li></ul></li></ul><p class="line874">For Canadian Cross builds, first make sure you have the appropriate Debian/Ubuntu mingw32 and mingw-w64 packages installed if building for Windows. After that, build the cross compiler and add the built bin directory to your PATH before finally doing the Canadian Cross build. The final build is used to build host executables only. The cross compiler is required to compile the libraries (sysroot, libgcc, libstdc++, etc.), as the host executables can't be executed on the build system. <span class="anchor" id="line-151"></span><span class="anchor" id="line-152"></span><p class="line867">
+<h2 id="ABE_Directory_Structure">ABE Directory Structure</h2>
+<span class="anchor" id="line-153"></span><span class="anchor" id="line-154"></span><p class="line874">Running configure in a clean project directory will define the following default assumptions about the build environment: <span class="anchor" id="line-155"></span><span class="anchor" id="line-156"></span><p class="line862">* <strong>local snapshots</strong> - This is where all the downloaded sources get stored. The default is the current directory under snapshots.<br>
+ <span class="anchor" id="line-157"></span>* <strong>local build</strong> - This is where all the executables get built. The default is to have builds go in a top level directory which is the full hostname of the build machine. Under this a directory is created for the target architecture.<br>
+ <span class="anchor" id="line-158"></span><span class="anchor" id="line-159"></span><p class="line874">If configure is executed without any parameters, the defaults are used. It is also possible to change those values at configure time. For example: <span class="anchor" id="line-160"></span><span class="anchor" id="line-161"></span><p class="line867"><strong>../abe/configure</strong> <span class="anchor" id="line-162"></span><span class="anchor" id="line-163"></span><p class="line867"><strong>--with-local-snapshots=/path/to/snapshots</strong> <span class="anchor" id="line-164"></span><span class="anchor" id="line-165"></span><p class="line867"><strong>--with-local-builds=/path/to/destdir</strong> <span class="anchor" id="line-166"></span><span class="anchor" id="line-167"></span><p class="line862">This is useful if say you want to have 2 sessions of ABE running and do not want to have to download all the packages again. All you have to do is configure the second ABE with <strong>--with-local-snaphosts=&lt;absolute path to the first ABE’s local snapshots directory&gt;</strong>. Note that path for these options are <strong>absolute</strong>! <span class="anchor" id="line-168"></span><span class="anchor" id="line-169"></span><p class="line862">You can execute <strong>./configure --help</strong> to get the full list of configure time parameters. <span class="anchor" id="line-170"></span><span class="anchor" id="line-171"></span><p class="line862">The configure process produces a <strong>host.conf</strong> file, with the default settings. This file is read by ABE at runtime, so it's possible to change the values and rerun abe.sh to use the new values. Each toolchain component also has a config file. The default version is copied at build time to the build tree. It is also possible to edit this file, usually called something like <strong>gcc.conf</strong>, to change the toolchain component specific values used when configuring the component. <span class="anchor" id="line-172"></span><span class="anchor" id="line-173"></span><p class="line862">You can see what values were used to configure each component by looking in the top of the <strong>config.log</strong> file, which is produced at configure time. For example: <span class="anchor" id="line-174"></span><span class="anchor" id="line-175"></span><p class="line867"><strong>head _build/${hostname}/${target}/${component}/config.log</strong> <span class="anchor" id="line-176"></span><span class="anchor" id="line-177"></span><p class="line867">
+<h2 id="User_Config_File_.28.2BAH4-.2F.aberc.29">User Config File (~/.aberc)</h2>
+<span class="anchor" id="line-178"></span><span class="anchor" id="line-179"></span><p class="line862">It's also possible for each user to have their own config file for default runtime options, which are ignored at configure time. This is located in the users home directory, and is called <strong>.aberc</strong>. Typical settings are: your email address (used for <a class="nonexistent" href="/ChangeLog">ChangeLog</a> entries), your launchpad ID, and your subversion ID for upstream commit. These are primarily used when building releases. One often-used setting is how many make jobs to run, in this example, it's on a quad-core machine with 8 threads. Any variable can be overridden by this file, so be careful. A list of useful variables is in <strong>lib/globals.sh</strong>. <span class="anchor" id="line-180"></span><span class="anchor" id="line-181"></span><p class="line862"># Used for <a class="nonexistent" href="/ChangeLog">ChangeLog</a> enttries <span class="anchor" id="line-182"></span><span class="anchor" id="line-183"></span><p class="line874">fullname="John Doe" <span class="anchor" id="line-184"></span><span class="anchor" id="line-185"></span><p class="line862">email=<a class="mailto" href="mailto:john.doe@linaro.org">john.doe@linaro.org</a> <span class="anchor" id="line-186"></span><span class="anchor" id="line-187"></span><p class="line874"># Used to checkout sources <span class="anchor" id="line-188"></span><span class="anchor" id="line-189"></span><p class="line874">launchpad_id=johndoe-foobar <span class="anchor" id="line-190"></span><span class="anchor" id="line-191"></span><p class="line874"># Optional flags to make we always want, in this example, spawn 8 jobs <span class="anchor" id="line-192"></span><span class="anchor" id="line-193"></span><p class="line874">make_flags="-j 8" <span class="anchor" id="line-194"></span><span class="anchor" id="line-195"></span><p class="line867">
+<h2 id="Default_Behaviors">Default Behaviors</h2>
+<span class="anchor" id="line-196"></span><span class="anchor" id="line-197"></span><p class="line874">There are several behaviors that may not be obvious, so they're documented here. One relates to GCC builds. When built natively, GCC only builds itself once, and is fully functional. When cross compiling, this works differently. A fully functional GCC can't be built without a sysroot, so a minimum compiler is built to build the C library. This is called stage1. This is then used to compile the C library. One this library is installed, then stage2 of GCC can be built. GCC stage2 is a fully functional compiler. <span class="anchor" id="line-198"></span><span class="anchor" id="line-199"></span><p class="line862">When building an entire toolchain using the 'all' option to <strong>--build</strong>, all components are built in the correct order, including both GCC stages. It is possible to specify building only GCC, in this case the stage1 configure flags are used if the C library isn't installed. If the C library is installed, then the stage2 flags are used. A message is displayed to document the automatic configure decision. <span class="anchor" id="line-200"></span><span class="anchor" id="line-201"></span><p class="line867">
+<h2 id="Specifying_Sources">Specifying Sources</h2>
+<span class="anchor" id="line-202"></span><span class="anchor" id="line-203"></span><p class="line862">Sources are either snapshots (tarballs) or repositories (git). The locations of the sources for all the packages can be found in <strong>config/sources.conf</strong>. You can also find and edit the location, along with other options, for each specific individual package under <strong>config/&lt;package&gt;.conf</strong>. <span class="anchor" id="line-204"></span><span class="anchor" id="line-205"></span><p class="line874">It's possible to specify a full tarball name, minus the compression part, which will be found dynamically. If the word 'tar' appears in the supplied name, it's only looked for on the remote directory. If the name is a URL for http or git, the source are instead checked out from a remote repository instead with the appropriate source code control system. <span class="anchor" id="line-206"></span><span class="anchor" id="line-207"></span><p class="line867">
+<h2 id="Specifying_Component_Versions">Specifying Component Versions</h2>
+<span class="anchor" id="line-208"></span><span class="anchor" id="line-209"></span><p class="line862">By default ABE uses the latest versions of all toolchain components as specified by the appropriate <strong>config/sources.conf</strong> and <strong>config/&lt;component&gt;.conf</strong> file. It's also possible to specify different versions on the command line. For example, you might want to do a toolchain build using a binutils snapshot you are working on. To do that, you'd do this: <span class="anchor" id="line-210"></span><span class="anchor" id="line-211"></span><p class="line867"><strong>abe.sh --target arm-linux-gnueabihf binutils=binutils-linaro-2.25.0-2015.01-2.tar.xz --build all</strong> <span class="anchor" id="line-212"></span><span class="anchor" id="line-213"></span><p class="line862">By default, this would go out and wget <a class="http" href="http://148.251.136.42/snapshots-ref/binutils-linaro-2.25.0-2015.01-2.tar.xz">http://148.251.136.42/snapshots-ref/binutils-linaro-2.25.0-2015.01-2.tar.xz</a>. This would only work with source tarballs. The syntax for a git revision is different, ie… <span class="anchor" id="line-214"></span><span class="anchor" id="line-215"></span><p class="line867"><strong>abe.sh --target arm-linux-gnueabihf binutils=binutils-gdb.git@abcdef --build all</strong> <span class="anchor" id="line-216"></span><span class="anchor" id="line-217"></span><p class="line874">For an url: <span class="anchor" id="line-218"></span><span class="anchor" id="line-219"></span><p class="line867"><strong>abe.sh --target arm-linux-gnueabihf binutils=<a class="https" href="https://&lt;url&gt;/binutils*.{git|tar.xz">https://&lt;url&gt;/binutils*.{git|tar.xz</a>} --build all</strong> <span class="anchor" id="line-220"></span><span class="anchor" id="line-221"></span><p class="line862">This would build and install that version of the binutils, and use it for the rest of the build. Specifying a version works Makefile-style, i.e. <strong>name=value</strong>. A version for each of the components can be specified at the same time. <span class="anchor" id="line-222"></span><span class="anchor" id="line-223"></span><p class="line867">
+<h2 id="Specifying_Local_or_Remote_Tarballs_or_Repositories">Specifying Local or Remote Tarballs or Repositories</h2>
+<span class="anchor" id="line-224"></span><span class="anchor" id="line-225"></span><p class="line862">Remote tarballs are downloaded by default from <a class="http" href="http://148.251.136.42/snapshots-ref/">http://148.251.136.42/snapshots-ref/</a>. You can override download locations of tarballs or repositories by specifying "&lt;component&gt;=<a class="https" href="https://&lt;url&gt;/&lt;component&gt;.{git|tar.xz">https://&lt;url&gt;/&lt;component&gt;.{git|tar.xz</a>}" on the command line. E.g. <span class="anchor" id="line-226"></span><span class="anchor" id="line-227"></span><p class="line867"><strong> <span class="anchor" id="line-228"></span>gcc=<a class="https" href="https://git.foo.com/gcc.git">https://git.foo.com/gcc.git</a>, or<br>
+ <span class="anchor" id="line-229"></span>gcc=<a class="http" href="http://bar.com/gcc.tar.xz">http://bar.com/gcc.tar.xz</a> <span class="anchor" id="line-230"></span></strong> <span class="anchor" id="line-231"></span><br>
+ <span class="anchor" id="line-232"></span><br>
+ <span class="anchor" id="line-233"></span>For local tarballs, the build process is as follows: <span class="anchor" id="line-234"></span><span class="anchor" id="line-235"></span><p class="line874">1. copy the tar file and corresponding .asc file (if available) into the snapshots directory <span class="anchor" id="line-236"></span><span class="anchor" id="line-237"></span><p class="line874">2. if no .asc file was available, then create one using: <span class="anchor" id="line-238"></span><strong>md5sum .../snapshots/foo.tar.xz &gt; foo.tar.xz.asc</strong> <span class="anchor" id="line-239"></span><span class="anchor" id="line-240"></span><p class="line874">3. build using "--disable update". If "--disable update" is not used then the build will fail because ABE will try to check for a newer copy of the file on the webserver and will fail because the file does not exist. <span class="anchor" id="line-241"></span><span class="anchor" id="line-242"></span><p class="line874">Please NOTE that even with "--disable update", ABE will still fail if there is no network connection, as it always validates the git repo URLs. <span class="anchor" id="line-243"></span><span class="anchor" id="line-244"></span><p class="line867">
+<h2 id="Building_Linaro_Releases_from_Manifest">Building Linaro Releases from Manifest</h2>
+<span class="anchor" id="line-245"></span><span class="anchor" id="line-246"></span><p class="line874">Support for manifests is only available for releases 2016.05 and newer! <span class="anchor" id="line-247"></span><span class="anchor" id="line-248"></span><p class="line867"><strong>abe.sh --manifest /path/to/manifest.txt --build all --tarbin</strong> <span class="anchor" id="line-249"></span><span class="anchor" id="line-250"></span><p class="line874">--tarbin is required if the manifest was created by a build with --tarbin, which is the case for our release builds. <span class="anchor" id="line-251"></span><span class="anchor" id="line-252"></span><p class="line862">The manifest encodes the target and the configure flag options, so you need the correct manifest for the target you want to build. You can download manifests from <a class="http" href="http://releases.linaro.org/components/toolchain/binaries/">http://releases.linaro.org/components/toolchain/binaries/</a>. <span class="anchor" id="line-253"></span><span class="anchor" id="line-254"></span><p class="line874">If using the win32 manifest to build a Canadian cross, from the same build dir, do: <span class="anchor" id="line-255"></span><span class="anchor" id="line-256"></span><p class="line867"><strong> <span class="anchor" id="line-257"></span><ol type="1"><li><p class="line862">sudo apt-get install mingw32 mingw32-binutils mingw32-runtime #or install from <a class="https" href="https://sourceforge.net/projects/mingw">https://sourceforge.net/projects/mingw</a> <span class="anchor" id="line-258"></span></li><li>abe.sh --manifest /path/to/linux/manifest.txt --build all  <span class="anchor" id="line-259"></span></li><li>abe.sh --manifest /path/to/win32/manifest.txt --host i686-w64-mingw32 --build all --tarbin <span class="anchor" id="line-260"></span></li></ol><p class="line867"></strong> <span class="anchor" id="line-261"></span><span class="anchor" id="line-262"></span><p class="line867">
+<h2 id="Building_Your_Own_Releases">Building Your Own Releases</h2>
+<span class="anchor" id="line-263"></span><span class="anchor" id="line-264"></span><p class="line874">Releases can be built using the below option: <span class="anchor" id="line-265"></span><span class="anchor" id="line-266"></span><p class="line867"><strong>--release &lt;release_date_or_name&gt; --tarball/--tarbin/--tarsrc</strong> <span class="anchor" id="line-267"></span><span class="anchor" id="line-268"></span><p class="line862">To package a release, add to the abe.sh command line <strong>'--tarball</strong>' which makes source and binary tarballs. These have a long name based on the branch and revision, so to specify the release use <strong>'--release &lt;release_date_or_name&gt;</strong>'. For example: <span class="anchor" id="line-269"></span><span class="anchor" id="line-270"></span><p class="line867"><strong>abe.sh --target arm-linux-gnueabihf --release 2017.01 --tarball --build all</strong> <span class="anchor" id="line-271"></span><span class="anchor" id="line-272"></span><p class="line867">
+<h2 id="Testing_and_Verifying_A_Toolchain_Built_With_ABE">Testing and Verifying A Toolchain Built With ABE</h2>
+<span class="anchor" id="line-273"></span><span class="anchor" id="line-274"></span><p class="line867"><strong>Native and Remote Testing</strong> <span class="anchor" id="line-275"></span><span class="anchor" id="line-276"></span><p class="line862">To verify the built toolchain, use the <strong>--check</strong> option. <span class="anchor" id="line-277"></span><span class="anchor" id="line-278"></span><p class="line867"><strong>abe.sh --check --build all</strong> <span class="anchor" id="line-279"></span><span class="anchor" id="line-280"></span><p class="line862">This will run <strong>make check</strong> on the packages. For cross builds this will run the tests on native hardware. <span class="anchor" id="line-281"></span><span class="anchor" id="line-282"></span><p class="line862">For setting up remote testing, <strong>Dejagnu</strong> can be used. <span class="anchor" id="line-283"></span><span class="anchor" id="line-284"></span><p class="line867">
+<h2 id="Getting.2FDownloading_Component_Source_code">Getting/Downloading Component Source code</h2>
+<span class="anchor" id="line-285"></span><span class="anchor" id="line-286"></span><p class="line867"><strong> abe.sh --manifest /path/to/manifest --checkout all </strong> <span class="anchor" id="line-287"></span><span class="anchor" id="line-288"></span><p class="line867">
+<h2 id="Full_Options_List">Full Options List</h2>
+<span class="anchor" id="line-289"></span><span class="anchor" id="line-290"></span><p class="line862">Run ‘<strong>abe.sh --help</strong>’ for a detailed description of all options. <span class="anchor" id="line-291"></span><span class="anchor" id="line-292"></span><p class="line867">
+<h2 id="Manual_Hacking">Manual Hacking</h2>
+<span class="anchor" id="line-293"></span><span class="anchor" id="line-294"></span><p class="line862">ABE is oriented towards development, so it’s possible to mix the automated builds with manual hacking. ABE creates a ‘builds’ directory under the directory <em>configure</em> was run in. Under this ‘builds’ directory is a top level directory that is of the value returned by the <em>hostname</em> command. Under this directory another is created using <strong>${target}</strong>. Under this, all of the build directories for each project are created. ABE does not build in the source tree of a project, it uses a separate build directory to keep things clean. <span class="anchor" id="line-295"></span><span class="anchor" id="line-296"></span><p class="line862">For configure changes, change to the build directory <strong>_build/builds/$host/$target</strong>. Then change into the project directory. You can extract the existing configure parameters by doing a <strong>head config.log</strong>, and then cutting and pasting them into the terminal. You can edit the command line to configure at this time to change anything you need. Make sure the cross-compiler is in your path. This can be found in the build tree as well. This gets installed using the prefix <strong>builds/destdir/$host/bin</strong>. Once configured, you can run <em>make</em> manually to build the project. <span class="anchor" id="line-297"></span><span class="anchor" id="line-298"></span><p class="line862">To avoid having to time download the <strong>_build/snapshots</strong> directory again, which can take a long time, you can have multiple _build/builds_xxx directories created (e.g. _build/builds_gcc5 and _build/builds_gcc6) and just rename the one you want to work on back to <strong>_build/builds</strong> before you start building. Just make sure to handle carefully the frequent need to rename the builds and builds_xxx directories back and forth, and not confuse yourself. <span class="anchor" id="line-299"></span><span class="anchor" id="line-300"></span><p class="line862">Another way to change the configuration of a project, but still use ABE for the building the rest of the toolchain, is to edit the runtime config file for the project. When the <strong>abe.sh</strong> script is run, it copies the config file for that project from the config directory to the build directory. This is sourced last, so any changes to this file will be used by ABE when configuring. This file is located in the top-level of the build tree for the project. Look for the <strong>*.conf</strong> file. <span class="anchor" id="line-301"></span><span class="anchor" id="line-302"></span><p class="line874">For source file changes, you can change to the directory the snapshots are stored in. Each project's source is extracted into this directory. As long as the source tarball hasn't changed, it isn't extracted over an existing source tree. Any changes you make to those sources won't be overwritten. <span class="anchor" id="line-303"></span><span class="anchor" id="line-304"></span><p class="line867">
+<h2 id="Jenkins_Integration">Jenkins Integration</h2>
+<span class="anchor" id="line-305"></span><span class="anchor" id="line-306"></span><p class="line862">ABE has been integrated into the Jenkins automated build system. This is enabled through the <strong>jenkins.sh</strong> script, which is executed by Jenkins to do the actual build. You can access the main page for ABE at <strong><a class="https" href="https://ci.linaro.org/job/tcwg-make-release/">https://ci.linaro.org/job/tcwg-make-release/</a></strong>. Build logs can be accessed through the build on the Jenkins web page. <span class="anchor" id="line-307"></span><span class="anchor" id="line-308"></span><p class="line867">
+<h2 id="FAQ">FAQ</h2>
+<span class="anchor" id="line-309"></span><span class="anchor" id="line-310"></span><ul><li style="list-style-type:none"><p class="line891"><strong>Is it possible to install the toolchain at a desired location?</strong><br>
+ <span class="anchor" id="line-311"></span><span class="anchor" id="line-312"></span>We suggest creating a tarball release (with --tarbin) and then extracting it at the required path. <span class="anchor" id="line-313"></span></li></ul><span class="anchor" id="bottom"></span></div><p id="pageinfo" class="info" lang="zh" dir="ltr">ABE  (最后修改时间 2017-02-16 04:25:42)</p>
+
+</div>
+</div>
+</div>
+<div id="pagebottom"></div>
+</div>
+
+<div id="footer">
+<div id="footer_inner">
+
+        <div id="footer_social" class="repeat">
+            <h2 class="rulelight light">Follow <span>Linaro</span></h2>
+            <a target="_blank" href="http://www.linaro.org/blog" class="repeat socials blog" title="Visit the Linaro Blog"><span></span>Blog</a>
+            <a target="_blank" href="https://launchpad.net/linaro" class="repeat socials launchpad" title="See Linaro's Current Project Blueprints"><span></span>Launchpad</a>
+            <a target="_blank" href="http://planet.linaro.org" class="repeat socials planet pad-right" title="Read blog posts from around the web about Linaro"><span></span>Planet</a>
+            <a target="_blank" href="http://www.facebook.com/pages/Linaro/155974581091106" class="repeat socials facebook" title="Visit Linaro's Facebook page"><span></span>Facebook</a>
+            <a target="_blank" href="http://www.flickr.com/photos/linaroorg/" class="repeat socials flickr" title="See photos from Linaro events on our Flickr channel"><span></span>Flickr</a>
+            <a target="_blank" href="https://plus.google.com/112814496864921562564" class="repeat socials gplus" title="Connect with Linaro on Google+"><span></span>Google+</a>
+            <a target="_blank" href="http://twitter.com/linaroorg" class="repeat socials twitter" title="Connect with Linaro on Twitter"><span></span>Twitter</a>
+            <a target="_blank" href="http://www.youtube.com/user/linaroorg" class="repeat socials youtube" title="View video content from Linaro on YouTube"><span></span>Youtube</a>
+        </div>
+
+        <div id="footer_nav" class="repeat">
+            <p class="rulelight light small">
+                Portions of this content &copy; 2010 - 2012 <span>Linaro</span>
+            </p>
+            <p class="light small">
+                <a target="_blank" href="http://www.linaro.org/sitemap" title="View a full sitemap of www.linaro.org">Sitemap</a>|
+                <a target="_blank" href="http://www.linaro.org/legal" title="Linaro Terms, Conditions and Privacy Policy">Legal</a>|
+                <a target="_blank" href="http://www.linaro.org/contact" title="Contact details for Linaro">Contact</a></p>
+            <p class="light small"><ul id="credits">
+<li><a href="http://moinmo.in/" title="This site uses the MoinMoin Wiki software.">MoinMoin Powered</a></li><li><a href="http://moinmo.in/Python" title="MoinMoin is written in Python.">Python Powered</a></li><li><a href="http://moinmo.in/GPL" title="MoinMoin is GPL licensed.">GPL licensed</a></li><li><a href="http://validator.w3.org/check?uri=referer" title="Click here to validate this page.">Valid HTML 4.01</a></li>
+</ul>
+</p>
+        </div>
+
+</div>
+</div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-16756069-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';      
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>
+
